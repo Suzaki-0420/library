@@ -24,4 +24,11 @@ export interface IBookRepository {
      * @returns 登録された商品（非同期）
      */
     register(book: BookRegistration): Promise<Book>;
+
+    updateBook(
+        bookId: string,
+        title: string,
+        author: string,
+        stock: number
+    ): Promise<Book | null>;
 }

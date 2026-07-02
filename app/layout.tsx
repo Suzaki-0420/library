@@ -1,6 +1,7 @@
 import BasicLayout from "./layout/basic";
 import { Geist } from "next/font/google";
 import FrontMenuLayout from "./layout/frontmenu";
+import { Toaster } from "sonner";
 //import { NextAuthProvider } from "@/components/provider/NextAuthProvider";
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });

@@ -6,33 +6,29 @@ import { BookCategory } from "@/models/BookCategory";
 import { BookRegistration } from "@/models/BookRegistration";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 
-/**
- * 演習 8-11 状態管理とサービスを繋ぐカスタムHookを実装する
- * 商品登録画面の状態管理とイベントハンドリングを行うカスタムHook
- */
 export const useRegisterBook = () => {
     const service = container.get<IRegisterBookService>(
         TYPES.IRegisterBookService
     );
 
     const [formData, setFormData] = useState<BookRegistration>({
-        name: "",
+        title: "",
         author: "",
-        stock: 0,
         categoryId: "",
+        stock: 0,
     });
 
     const [categories, setCategories] = useState<BookCategory[]>([]);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
 
     const resetForm = useCallback(() => {
         setFormData({
-            name: "",
+            title: "",
             author: "",
-            stock: 0,
             categoryId: "",
+            stock: 0,
         });
         setErrors({});
         setIsSuccess(false);
@@ -61,6 +57,13 @@ export const useRegisterBook = () => {
             ...prev,
             [name]: name === "stock" ? Number(value) : value,
         }));
+
+        setErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors[name];
+            delete newErrors.submit;
+            return newErrors;
+        });
     }, []);
 
     const handleCategoryChange = useCallback((categoryId: string) => {
@@ -68,29 +71,41 @@ export const useRegisterBook = () => {
             ...prev,
             categoryId,
         }));
+
+        setErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors.categoryId;
+            delete newErrors.category;
+            delete newErrors.submit;
+            return newErrors;
+        });
     }, []);
 
     const handleNameBlur = useCallback(async () => {
-        if (!formData.name) return;
+        console.log("重複チェック開始:", formData.title);
+        if (!formData.title.trim()) {
+            return;
+        }
 
         try {
             setErrors((prev) => {
                 const newErrors = { ...prev };
-                delete newErrors.name;
+                delete newErrors.title;
                 return newErrors;
             });
 
-            await service.validateBookName(formData.name);
+            await service.validateBookName(formData.title);
+            console.log("重複なし");
         } catch (error: any) {
+            console.log("重複チェックエラー:", error.message);
             setErrors((prev) => ({
                 ...prev,
-                name: error.message,
+                title: error.message,
             }));
         }
-    }, [formData.name, service]);
+    }, [formData.title, service]);
 
     const handleSubmit = useCallback(async (): Promise<Book | null> => {
-        setIsLoading(true);
 
         try {
             const result = await service.execute(formData);
@@ -101,10 +116,27 @@ export const useRegisterBook = () => {
 
             return result;
         } catch (error: any) {
-            setErrors((prev) => ({
-                ...prev,
-                submit: error.message,
-            }));
+            try {
+                const parsed = JSON.parse(error.message);
+
+                if (parsed.type === "validation") {
+                    const convertedErrors: { [key: string]: string } = {};
+
+                    Object.entries(parsed.errors).forEach(([key, value]) => {
+                        const normalizedKey =
+                            key.charAt(0).toLowerCase() + key.slice(1);
+
+                        convertedErrors[normalizedKey] = String(value);
+                    });
+
+                    setErrors(convertedErrors);
+                } else {
+                    setErrors({ submit: error.message });
+                }
+            } catch {
+                setErrors({ submit: error.message });
+            }
+
             return null;
         } finally {
             setIsLoading(false);

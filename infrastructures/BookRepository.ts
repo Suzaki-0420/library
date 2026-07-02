@@ -33,6 +33,7 @@ export class BookRepository implements IBookRepository {
 
     async existsByName(title: string): Promise<void> {
         const params = new URLSearchParams({ keyword: title });
+        console.log("タイトル：", title);
 
         const response = await fetch(`/proxy-api/books?${params.toString()}`, {
             method: "GET",
@@ -42,10 +43,25 @@ export class BookRepository implements IBookRepository {
         });
 
         if (!response.ok) {
-            const errorText = await response.clone().text();
-            console.log("existsByName error body:", errorText);
+            const errorData = await response.json().catch(() => ({}));
+            if (errorData.message) {
+                throw new Error(errorData.message);
+            }
+            if (errorData.errors) {
+                const messages = Object.values(errorData.errors).flat().join("\n");
+                throw new Error(messages);
+            }
+            throw new Error(`書籍名の検証に失敗しました (Status: ${response.status})`);
 
-            throw new Error("図書名の検証に失敗しました。");
+        }
+        const books = await response.json();
+        console.log("結果：", books);
+
+
+        const exists = books.some((book: any) => book.title === title);
+
+        if (exists) {
+            throw new Error("同じ書籍名がすでに登録されています。");
         }
     }
 
@@ -59,10 +75,76 @@ export class BookRepository implements IBookRepository {
         });
 
         if (!response.ok) {
-            const errorText = await response.clone().text();
-            console.log("register error body:", errorText);
+            const errorData = await response.json().catch(() => ({}));
+
+            console.log("register errorData:", errorData);
+
+            if (errorData.errors) {
+                const fieldErrors: { [key: string]: string } = {};
+
+                Object.entries(errorData.errors).forEach(([key, value]) => {
+                    const normalizedKey =
+                        key.charAt(0).toLowerCase() + key.slice(1);
+
+                    fieldErrors[normalizedKey] = Array.isArray(value)
+                        ? String(value[0])
+                        : String(value);
+                });
+
+                throw new Error(
+                    JSON.stringify({
+                        type: "validation",
+                        errors: fieldErrors,
+                    })
+                );
+            }
+
+            if (errorData.message) {
+                throw new Error(errorData.message);
+            }
 
             throw new Error(`図書の登録に失敗しました (Status: ${response.status})`);
+        }
+
+        return await response.json();
+    }
+
+    public async updateBook(
+        bookId: string,
+        title: string,
+        author: string,
+        stock: number
+    ): Promise<Book | null> {
+
+        const response = await fetch(`/proxy-api//books/${bookId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                title,
+                author,
+                stock
+            })
+        });
+
+        if (response.status === 404) {
+            return null;
+        }
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+
+            if (errorData.message) {
+                throw new Error(errorData.message);
+            }
+
+            if (errorData.errors) {
+                const messages = Object.values(errorData.errors).flat().join("\n");
+                throw new Error(messages);
+            }
+
+            throw new Error(`商品の更新に失敗しました (Status: ${response.status})`);
         }
 
         return await response.json();

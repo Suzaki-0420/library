@@ -1,8 +1,13 @@
-"use client";
+import { BookUpdate } from "@/components/books/update/BookUpdate";
 
-export default function UpdatePage() {
+/**
+ * 図書更新ページ
+ * URL: /books/edit
+ */
+export default function BookUpdatePage() {
     return (
-        <div>更新ページ：後ほど実装</div>
-    )
-
+        <main className="container mx-auto py-8">
+            <BookUpdate />
+        </main>
+    );
 }

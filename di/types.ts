@@ -4,5 +4,6 @@ export const TYPES = {
     IBookCategoryRepository: Symbol.for("IBookCategoryRepository"),
     // サービス(ユースケース)層
     ISearchBookService: Symbol.for("ISearchBookService"),
-    IRegisterBookService: Symbol.for("IRegisterBookService")
+    IRegisterBookService: Symbol.for("IRegisterBookService"),
+    IUpdateBookService: Symbol.for("IUpdateBookService")
 };

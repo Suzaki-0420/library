@@ -13,10 +13,6 @@ export default function FrontMenuLayout({ children }: { children: React.ReactNod
             {/* 💡 画面全体を縦並び（flex-col）にし、最低でも画面の高さ（min-h-screen）を確保する */}
             <body className="flex flex-col min-h-screen bg-slate-50 font-sans">
 
-                {/* === ここからヘッダー === */}
-                {/* このHeaderコンポーネントの中で bg-green-100 を使用しています */}
-                <Header />
-                {/* === ここまで：ヘッダー === */}
 
                 {/* === ここに各ページのコンテンツ (page.tsx) が入る === */}
                 {/* 💡 flex-1 をつけることで、メイン画面が「余った空間をすべて埋める」ように伸びる */}
