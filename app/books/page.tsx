@@ -5,10 +5,5 @@ import { BookSearch } from "@/components/books/search/BookSearch";
  * URL: /api/Books/search
  */
 export default function BookSearchPage() {
-    return (
-        <main className="container mx-auto py-8">
-            {/* 先ほど作成したUIコンポーネントを呼び出す */}
-            <BookSearch />
-        </main>
-    );
+    return <BookSearch />;
 }

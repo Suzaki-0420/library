@@ -116,7 +116,7 @@ export class BookRepository implements IBookRepository {
         stock: number
     ): Promise<Book | null> {
 
-        const response = await fetch(`/proxy-api//books/${bookId}`, {
+        const response = await fetch(`/proxy-api/books/${bookId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -128,8 +128,64 @@ export class BookRepository implements IBookRepository {
             })
         });
 
+        const responseText = await response.clone().text();
+
+        console.log("========== UPDATE BOOK ==========");
+        console.log("request body:", { title, author, stock });
+        console.log("status:", response.status);
+        console.log("ok:", response.ok);
+        console.log("response body:", responseText);
+        console.log("=================================");
+
         if (response.status === 404) {
             return null;
+        }
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+
+            console.log("register errorData:", errorData);
+
+            if (errorData.errors) {
+                const fieldErrors: { [key: string]: string } = {};
+
+                Object.entries(errorData.errors).forEach(([key, value]) => {
+                    const normalizedKey =
+                        key.charAt(0).toLowerCase() + key.slice(1);
+
+                    fieldErrors[normalizedKey] = Array.isArray(value)
+                        ? String(value[0])
+                        : String(value);
+                });
+
+                throw new Error(
+                    JSON.stringify({
+                        type: "validation",
+                        errors: fieldErrors,
+                    })
+                );
+            }
+
+            if (errorData.message) {
+                throw new Error(errorData.message);
+            }
+
+            throw new Error(`図書の更新に失敗しました (Status: ${response.status})`);
+        }
+
+        return await response.json();
+    }
+
+    public async deleteBook(bookId: string): Promise<boolean> {
+        const response = await fetch(`/proxy-api/books/${bookId}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (response.status === 404) {
+            return false;
         }
 
         if (!response.ok) {
@@ -140,13 +196,16 @@ export class BookRepository implements IBookRepository {
             }
 
             if (errorData.errors) {
-                const messages = Object.values(errorData.errors).flat().join("\n");
+                const messages = Object.values(errorData.errors)
+                    .flat()
+                    .join("\n");
+
                 throw new Error(messages);
             }
 
-            throw new Error(`商品の更新に失敗しました (Status: ${response.status})`);
+            throw new Error(`図書の削除に失敗しました (Status: ${response.status})`);
         }
 
-        return await response.json();
+        return true;
     }
 }

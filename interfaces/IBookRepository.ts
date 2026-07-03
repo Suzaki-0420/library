@@ -31,4 +31,6 @@ export interface IBookRepository {
         author: string,
         stock: number
     ): Promise<Book | null>;
+
+    deleteBook(bookId: string): Promise<boolean>;
 }

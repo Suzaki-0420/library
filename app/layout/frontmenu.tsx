@@ -17,7 +17,7 @@ export default function FrontMenuLayout({ children }: { children: React.ReactNod
                 {/* === ここに各ページのコンテンツ (page.tsx) が入る === */}
                 {/* 💡 flex-1 をつけることで、メイン画面が「余った空間をすべて埋める」ように伸びる */}
                 {/* これにより、中身が少なくてもフッターが強制的に一番下まで押し出されます */}
-                <main className="flex-1 container mx-auto p-4 md:p-8">
+                <main className="flex-1">
                     {children}
                 </main>
 

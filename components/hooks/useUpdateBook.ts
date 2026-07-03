@@ -70,6 +70,24 @@ export const useUpdateBook = () => {
         }
     };
 
+    const handleAuthorBlur = async () => {
+        if (!editAuthor.trim()) return;
+
+        try {
+            setErrors((prev) => {
+                const newErrors = { ...prev };
+                delete newErrors.author;
+                return newErrors;
+            });
+
+        } catch (error: any) {
+            setErrors((prev) => ({
+                ...prev,
+                author: error.message ?? "著者名の検証に失敗しました。",
+            }));
+        }
+    };
+
     const update = async (): Promise<Book | null> => {
         if (!selectedBook) return null;
 
@@ -90,8 +108,10 @@ export const useUpdateBook = () => {
 
             return result;
         } catch (error: any) {
+            console.log("update catch:", error.message);
             try {
                 const parsed = JSON.parse(error.message);
+                console.log("parsed:", parsed);
 
                 if (parsed.type === "validation") {
                     setErrors(parsed.errors);
@@ -99,7 +119,7 @@ export const useUpdateBook = () => {
                     setErrors({ submit: error.message });
                 }
             } catch {
-                setErrors({ submit: error.message ?? "図書の更新に失敗しました。" });
+                setErrors({ submit: error.message });
             }
 
             return null;
@@ -124,6 +144,7 @@ export const useUpdateBook = () => {
         selectBook,
         update,
         handleTitleBlur,
+        handleAuthorBlur,
         openConfirm,
         closeConfirm,
         confirmUpdate,

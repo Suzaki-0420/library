@@ -1,8 +1,5 @@
-"use client";
+import { BookDelete } from "@/components/books/delete/BookDelete";
 
-export default function UpdatePage() {
-    return (
-        <div>削除ページ：後ほど実装</div>
-    )
-
+export default function BookDeletePage() {
+    return <BookDelete />;
 }

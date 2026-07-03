@@ -31,9 +31,10 @@ export default function MenuPage() {
             href: "/books",
             icon: Search,
             buttonText: "検索する",
-            color: "border-sky-200 bg-sky-50 text-sky-600",
+            color: "border-sky-200 bg-[#eef6fd]/80 text-sky-600",
             buttonColor: "bg-sky-500 hover:bg-sky-600",
             emoji: "📖",
+            src: "/1.png",
         },
         {
             title: "図書の登録",
@@ -41,9 +42,10 @@ export default function MenuPage() {
             href: "/books/new",
             icon: Plus,
             buttonText: "登録する",
-            color: "border-green-200 bg-green-50 text-green-600",
+            color: "border-green-200 bg-[#f1f8ec]/80 text-green-600",
             buttonColor: "bg-green-500 hover:bg-green-600",
             emoji: "🐿️",
+            src: "/2.png",
         },
         {
             title: "図書の変更",
@@ -51,9 +53,10 @@ export default function MenuPage() {
             href: "/books/edit",
             icon: Pencil,
             buttonText: "変更する",
-            color: "border-amber-200 bg-amber-50 text-amber-600",
+            color: "border-amber-200 bg-[#fef7ec]/80 text-amber-600",
             buttonColor: "bg-amber-500 hover:bg-amber-600",
             emoji: "✏️",
+            src: "/3.png",
         },
 
         {
@@ -62,9 +65,10 @@ export default function MenuPage() {
             href: "/books/delete",
             icon: BookOpen,
             buttonText: "削除する",
-            color: "border-cyan-200 bg-cyan-50 text-cyan-600",
-            buttonColor: "bg-cyan-500 hover:bg-cyan-600",
+            color: "border-pink-200 bg-[#fef3f0]/80 text-[#eb6fde]",
+            buttonColor: "bg-[#eb6fde] hover:bg-[#c652ba]",
             emoji: "🛒",
+            src: "/4.png",
         },
 
     ];
@@ -74,12 +78,12 @@ export default function MenuPage() {
             <SidebarProvider>
                 <Sidebar />
 
-                <SidebarInset>
-                    <main className="relative min-h-screen overflow-hidden bg-[#fff8e8] p-10 text-[#5b3a1e]">
+                <SidebarInset className="bg-[url('/back.png')] bg-cover bg-center bg-fixed">
+                    <main className="relative min-h-screen w-full overflow-hidden p-10 text-[#5b3a1e]">
                         {/* メイン */}
                         <div className="absolute left-0 top-0 h-40 w-full bg-gradient-to-b from-green-100/80 to-transparent" />
-                        <div className="absolute right-10 top-8 text-5xl">🐦</div>
-                        <div className="absolute bottom-8 right-10 text-6xl">🦔</div>
+                        <div className="absolute right-10 top-8 text-5xl"></div>
+                        <div className="absolute bottom-8 right-10 text-6xl"></div>
 
                         <div className="relative z-10 mb-8 rounded-[2rem] border border-orange-100 bg-white/80 p-8 shadow-sm">
                             <div className="flex items-center justify-between gap-6">
@@ -98,12 +102,12 @@ export default function MenuPage() {
                             </div>
                         </div>
 
-                        <div className="relative z-10 grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div className="relative z-10 grid grid-cols-1 gap-6 md:grid-cols-2 justify-items-center">
                             {menuItems.map((item) => {
                                 return (
                                     <div
                                         key={item.title}
-                                        className={`rounded-[2rem] border-2 ${item.color} p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl`}
+                                        className={`w-full max-w-2xl rounded-[2rem] border-2 ${item.color} p-3 shadow-sm transition `}
                                     >
                                         <h3 className="text-center text-xl font-bold">
                                             {item.title}
@@ -113,9 +117,9 @@ export default function MenuPage() {
                                             {item.description}
                                         </p>
 
-                                        <div className="mt-4 flex justify-center">
+                                        <div className="mt-4 flex h-[140px] items-center justify-center">
                                             <Image
-                                                src="/blue.png"
+                                                src={item.src}
                                                 alt={`${item.title}のイラスト`}
                                                 width={220}
                                                 height={140}
